@@ -1,12 +1,12 @@
 #include "../include/MyStack.h"
 
 
-ErrorNumber StackCtor(stack_info* my_stack)
+ErrorNumbers StackCtor(stack_info* my_stack)
 {
     if(my_stack == NULL)
     {
         printf("Broken address my_stack\n");
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
 
     #ifdef _DEBUG_CHICK_CHIRICK
@@ -14,14 +14,14 @@ ErrorNumber StackCtor(stack_info* my_stack)
                                                   SIZE_CHICK_CHIRICK * 2);
     if(my_stack->full_data == NULL)
     {
-        return CALLOC_ERROR;
+        return _CALLOC_ERROR;
     }
     my_stack->data = (StackElem_t*)((char*)my_stack->full_data + SIZE_CHICK_CHIRICK);
     #else
     my_stack->data = (StackElem_t*) calloc(MIN_STACK_SIZE, sizeof(StackElem_t));
     if(my_stack->data == NULL)
     {
-        return CALLOC_ERROR;
+        return _CALLOC_ERROR;
     }
     #endif // _DEBUG_CHICK_CHIRICK
 
@@ -34,11 +34,11 @@ ErrorNumber StackCtor(stack_info* my_stack)
         ((char*)(&my_stack->data[my_stack->size]))[i] = POISON_VALUE;
     }
 
-    ErrorNumber check_error = NO_ERROR;
+    ErrorNumbers check_error = _NO_ERROR;
 
     #ifdef _DEBUG_CHICK_CHIRICK
     check_error = StackChickChiric(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -46,7 +46,7 @@ ErrorNumber StackCtor(stack_info* my_stack)
 
     #ifdef _DEBUG_HASH_DJB
     check_error = calculateHash(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -57,7 +57,7 @@ ErrorNumber StackCtor(stack_info* my_stack)
     return check_error;
 }
 
-ErrorNumber StackDtor(stack_info* my_stack)
+ErrorNumbers StackDtor(stack_info* my_stack)
 {
     STACK_VERIFICATOR;
 
@@ -69,12 +69,12 @@ ErrorNumber StackDtor(stack_info* my_stack)
 
     *my_stack = {};
 
-    return NO_ERROR;
+    return _NO_ERROR;
 }
 
 #ifdef _DEBUG_HASH_DJB
 // https://github.com/dim13/djb2/blob/master/docs/hash.md - explanation of the hash function
-ErrorNumber calculateHash(stack_info* my_stack)
+ErrorNumbers calculateHash(stack_info* my_stack)
 {
     STACK_VERIFICATOR; // Эту вырежу
 
@@ -92,20 +92,20 @@ ErrorNumber calculateHash(stack_info* my_stack)
     }
 
     STACK_VERIFICATOR;
-    return NO_ERROR;
+    return _NO_ERROR;
 }
 #endif // _DEBUG_HASH_DJB
 
 #ifdef _DEBUG_CHICK_CHIRICK
-ErrorNumber StackChickChiric(stack_info* my_stack)
+ErrorNumbers StackChickChiric(stack_info* my_stack)
 {
     if(my_stack == NULL)
     {
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
     if(my_stack->full_data == NULL)
     {
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
 
     int* chick_chirick_in_struct_one = (int*)&(my_stack->chick_chirick_one);
@@ -126,16 +126,16 @@ ErrorNumber StackChickChiric(stack_info* my_stack)
 
     STACK_VERIFICATOR;
 
-    return NO_ERROR;
+    return _NO_ERROR;
 }
 #endif // _DEBUG_CHICK_CHIRICK
 
-ErrorNumber StackDump(stack_info* my_stack)
+ErrorNumbers StackDump(stack_info* my_stack)
 {
     FILE* file_address = fopen("DumpOutput.txt", "w");
     if(file_address == NULL)
     {
-        return OPEN_ERROR;
+        return _OPEN_ERROR;
     }
 
     if(my_stack != NULL)
@@ -148,7 +148,7 @@ ErrorNumber StackDump(stack_info* my_stack)
     {
         fprintf(file_address,
                 "Broken address my_stack\n");
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
 
     #ifdef _DEBUG_CHICK_CHIRICK
@@ -252,19 +252,19 @@ ErrorNumber StackDump(stack_info* my_stack)
 
     #undef  _
 
-    return NO_ERROR;
+    return _NO_ERROR;
 }
 
-ErrorNumber StackPush(stack_info* my_stack, StackElem_t element_value)
+ErrorNumbers StackPush(stack_info* my_stack, StackElem_t element_value)
 {
-    ErrorNumber check_error = NO_ERROR;
+    ErrorNumbers check_error = _NO_ERROR;
 
     STACK_VERIFICATOR;
 
     _CHECK_HASH_DJB;
 
     check_error = StackMemory(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -275,7 +275,7 @@ ErrorNumber StackPush(stack_info* my_stack, StackElem_t element_value)
 
     #ifdef _DEBUG_HASH_DJB
     check_error = calculateHash(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -286,9 +286,9 @@ ErrorNumber StackPush(stack_info* my_stack, StackElem_t element_value)
     return check_error;
 }
 
-ErrorNumber StackPop(stack_info* my_stack, StackElem_t* element_value)
+ErrorNumbers StackPop(stack_info* my_stack, StackElem_t* element_value)
 {
-    ErrorNumber check_error = NO_ERROR;
+    ErrorNumbers check_error = _NO_ERROR;
 
     STACK_VERIFICATOR;
 
@@ -296,7 +296,7 @@ ErrorNumber StackPop(stack_info* my_stack, StackElem_t* element_value)
 
     if(my_stack->size <= 0)
     {
-        return POP_ERROR;
+        return _CHECK_FOUND_ERROR;
     }
 
     my_stack->size--;
@@ -309,14 +309,14 @@ ErrorNumber StackPop(stack_info* my_stack, StackElem_t* element_value)
 
     #ifdef _DEBUG_HASH_DJB
     check_error = calculateHash(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
     #endif // _DEBUG_HASH_DJB
 
     check_error = StackMemory(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -327,9 +327,9 @@ ErrorNumber StackPop(stack_info* my_stack, StackElem_t* element_value)
     return check_error;
 }
 
-ErrorNumber StackMemory(stack_info* my_stack)
+ErrorNumbers StackMemory(stack_info* my_stack)
 {
-    ErrorNumber check_error = NO_ERROR;
+    ErrorNumbers check_error = _NO_ERROR;
 
     STACK_VERIFICATOR;
 
@@ -338,7 +338,7 @@ ErrorNumber StackMemory(stack_info* my_stack)
     int new_size = 0;
     if(my_stack->size < MIN_STACK_SIZE)
     {
-        return NO_ERROR;
+        return _NO_ERROR;
     }
     if(my_stack->size == my_stack->capacity)
     {
@@ -350,7 +350,7 @@ ErrorNumber StackMemory(stack_info* my_stack)
     }
     if(new_size == 0)
     {
-        return NO_ERROR;
+        return _NO_ERROR;
     }
 
     #ifdef _DEBUG_CHICK_CHIRICK
@@ -358,14 +358,14 @@ ErrorNumber StackMemory(stack_info* my_stack)
                                                                     SIZE_CHICK_CHIRICK * 2);
     if(my_stack->full_data == NULL)
     {
-        return CALLOC_ERROR;
+        return _CALLOC_ERROR;
     }
     my_stack->data = (StackElem_t*)((char*)my_stack->full_data + SIZE_CHICK_CHIRICK);
     #else
     my_stack->data = (StackElem_t*) realloc(my_stack->data, new_size * sizeof(StackElem_t));
     if(my_stack->data == NULL)
     {
-        return CALLOC_ERROR;
+        return _CALLOC_ERROR;
     }
     #endif // _DEBUG_CHICK_CHIRICK
 
@@ -375,7 +375,7 @@ ErrorNumber StackMemory(stack_info* my_stack)
 
     #ifdef _DEBUG_CHICK_CHIRICK
     check_error = StackChickChiric(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -383,7 +383,7 @@ ErrorNumber StackMemory(stack_info* my_stack)
 
     #ifdef _DEBUG_HASH_DJB
     check_error = calculateHash(my_stack);
-    if(check_error != NO_ERROR)
+    if(check_error != _NO_ERROR)
     {
         return check_error;
     }
@@ -394,32 +394,32 @@ ErrorNumber StackMemory(stack_info* my_stack)
     return check_error;
 }
 
-ErrorNumber StackVerificator(stack_info* my_stack)
+ErrorNumbers StackVerificator(stack_info* my_stack)
 {
     if(my_stack == NULL)
     {
         StackDump(my_stack);
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
     if(my_stack->data == NULL)
     {
         StackDump(my_stack);
-        return NULL_ADDRESS_ERROR;
+        return _NULL_ADDRESS_ERROR;
     }
     if(my_stack->size < 0)
     {
         StackDump(my_stack);
-        return CHECK_FOUND_ERROR;
+        return _CHECK_FOUND_ERROR;
     }
     if(my_stack->capacity < MIN_STACK_SIZE)
     {
         StackDump(my_stack);
-        return CHECK_FOUND_ERROR;
+        return _CHECK_FOUND_ERROR;
     }
     if(my_stack->size > my_stack->capacity)
     {
         StackDump(my_stack);
-        return CHECK_FOUND_ERROR;
+        return _CHECK_FOUND_ERROR;
     }
 
     #ifdef _DEBUG_CHICK_CHIRICK
@@ -439,10 +439,10 @@ ErrorNumber StackVerificator(stack_info* my_stack)
            chick_chirick_after_stack  [i] != BAD_BEDA)
         {
             StackDump(my_stack);
-            return CHECK_FOUND_ERROR;
+            return _CHECK_FOUND_ERROR;
         }
     }
     #endif // _DEBUG_CHICK_CHIRICK
 
-    return NO_ERROR;
+    return _NO_ERROR;
 }

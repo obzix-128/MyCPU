@@ -41,16 +41,6 @@
 
 typedef labels_info StackElem_t;
 
-enum ErrorNumber{
-    NO_ERROR           = 0,
-    CALLOC_ERROR       = 1,
-    CHECK_FOUND_ERROR  = 2,
-    OPEN_ERROR         = 3,
-    HASH_ERROR         = 4,
-    POP_ERROR          = 5,
-    NULL_ADDRESS_ERROR = 6
-};
-
 struct stack_info{
     #ifdef _DEBUG_CHICK_CHIRICK
     char chick_chirick_one[SIZE_CHICK_CHIRICK];
@@ -71,25 +61,25 @@ struct stack_info{
 
 const int MIN_STACK_SIZE = 16;
 
-ErrorNumber StackCtor(stack_info* my_stack);
-ErrorNumber StackDtor(stack_info* my_stack);
+ErrorNumbers StackCtor(stack_info* my_stack);
+ErrorNumbers StackDtor(stack_info* my_stack);
 
 #ifdef _DEBUG_HASH_DJB
-ErrorNumber calculateHash(stack_info* my_stack);
+ErrorNumbers calculateHash(stack_info* my_stack);
 #endif // _DEBUG_HASH_DJB
 #ifdef _DEBUG_CHICK_CHIRICK
-ErrorNumber StackChickChiric(stack_info* my_stack);
+ErrorNumbers StackChickChiric(stack_info* my_stack);
 #endif // _DEBUG_CHICK_CHIRICK
 
-ErrorNumber StackDump(stack_info* my_stack);
+ErrorNumbers StackDump(stack_info* my_stack);
 #define STACK_ELEM_T "%4.d"
 
-ErrorNumber StackPush(stack_info* my_stack, StackElem_t element_value);
-ErrorNumber StackPop (stack_info* my_stack, StackElem_t* element_value);
+ErrorNumbers StackPush(stack_info* my_stack, StackElem_t element_value);
+ErrorNumbers StackPop (stack_info* my_stack, StackElem_t* element_value);
 
-ErrorNumber StackMemory(stack_info* my_stack);
+ErrorNumbers StackMemory(stack_info* my_stack);
 
-ErrorNumber StackVerificator(stack_info* my_stack);
+ErrorNumbers StackVerificator(stack_info* my_stack);
 
 #define STACK_VERIFICATOR if(StackVerificator(my_stack)) return StackVerificator(my_stack);
 

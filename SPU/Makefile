@@ -10,13 +10,13 @@ FLAGS := -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equ
 CC := g++
 objects := $(patsubst source/%.cpp, objects/%.o, $(wildcard source/*.cpp))
 
-all: do.exe
+all: ../do.exe 
 
-do.exe: $(objects)
+../do.exe: $(objects)
 	@$(CC) $^ $(FLAGS) -o $@
 
 objects/%.o: source/%.cpp
 	@$(CC) -c $^ $(FLAGS) -o $@
 
 clean:
-	@rm -rf objects/*.o do
+	@rm -rf objects/*.o ../do.exe

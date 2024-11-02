@@ -3,6 +3,7 @@
 
 #include "../../GeneralDirectory/include/GeneralInclude.h"
 #include "MyStack.h"
+#include "ErrorHandler.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -18,5 +19,10 @@ struct info_array_with_commands {
     unsigned int size_of_array_with_commands;
     unsigned int number_of_commands;
 };
+
+#define CHECK_ERROR(func) check_error = func; if(check_error != _NO_ERROR) \
+                                                  {errorHandler(check_error); return check_error;}
+#define CHECK_NULL_ADDR_ERROR(variable, ERROR_NUMBER) if(variable == NULL) \
+                                     {return ERROR_NUMBER;}
 
 #endif // ASSEMBLER_H

@@ -1,0 +1,6 @@
+push 5
+push dx
+push dx+5
+push [6]
+push [hx]
+push [hx+6]

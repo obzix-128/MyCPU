@@ -1,7 +1,7 @@
-#include "../include/errorHandler.h"
+#include "../include/Assembler.h"
 
 
-ErrorNumbers errorHandler(ErrorNumbers error) //TODO: шо делать?
+ErrorNumbers errorHandler(ErrorNumbers error)
 {
     switch(error)
     {
@@ -58,6 +58,21 @@ ErrorNumbers errorHandler(ErrorNumbers error) //TODO: шо делать?
         case _FILE_NAME_ERROR:
         {
             fprintf(stderr, "ERROR: The file name is not specified\n");
+            break;
+        }
+        case _NULL_ADDRESS_ERROR:
+        {
+            fprintf(stderr, "ERROR: a null address was detected\n");
+            break;
+        }
+        case _CHECK_FOUND_ERROR:
+        {
+            fprintf(stderr, "ERROR: The verifier has detected an error\n");
+            break;
+        }
+        case _SIZE_COMMAND_ERROR:
+        {
+            fprintf(stderr, "ERROR: Increase the limit of command size\n");
             break;
         }
         default:

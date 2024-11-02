@@ -1,4 +1,8 @@
 #include "../include/Processor.h"
+#include "../include/ErrorHandler.h"
+#include "../include/ReadingFile.h"
+#include "../include/TextHandler.h"
+#include "../include/ExecuteCommands.h"
 
 
 int main(const int argc, const char** argv)
@@ -11,41 +15,23 @@ int main(const int argc, const char** argv)
     }
 
     ErrorNumbers check_error = _NO_ERROR;
-
     struct info_array_with_commands_txt commands = {};
 
-    check_error = readFileWithCommands(&commands, argv[1]);
-    if(check_error != _NO_ERROR)
-    {
-        errorHandler(check_error);
-        return check_error;
-    }
+    const char* WAY_TO_FILE  = "CommandsFilesNum/";
+    char* full_file_name = NULL;
 
-    check_error = checkVersion(&commands);
-    if(check_error != _NO_ERROR)
-    {
-        errorHandler(check_error);
-        return check_error;
-    }
+    CHECK_ERROR(combiningStrings(WAY_TO_FILE, argv[1], &full_file_name));
+    CHECK_ERROR(readFileWithCommands(&commands, full_file_name));
+    CHECK_ERROR(checkVersion(&commands));
 
     struct info_array_with_commands_code executable_code = {};
 
-    check_error = processingAnArrayOfCommands(&commands, &executable_code);
-    if(check_error != _NO_ERROR)
-    {
-        errorHandler(check_error);
-        return check_error;
-    }
-
-    check_error = executeCommands(&executable_code);
-    if(check_error != _NO_ERROR)
-    {
-        errorHandler(check_error);
-        return check_error;
-    }
+    CHECK_ERROR(processingAnArrayOfCommands(&commands, &executable_code));
+    
+    CHECK_ERROR(executeCommands(&executable_code));
 
     printf("DONE\n");
 
-    return NO_ERROR;
+    return _NO_ERROR;
 }
 

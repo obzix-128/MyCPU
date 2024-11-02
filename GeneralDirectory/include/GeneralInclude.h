@@ -27,7 +27,7 @@ enum CommandNumber{
 
 enum ErrorNumbers{
     _NO_ERROR           = 0,
-    _STAT_ERROR         = 1,
+    _STAT_ERROR         = -1,
     _OPEN_ERROR         = 2,
     _CALLOC_ERROR       = 3,
     _COMMAND_LIM_ERROR  = 4,
@@ -36,13 +36,18 @@ enum ErrorNumbers{
     _SIGNATURE_ERROR    = 7,
     _REGISTER_LIM_ERROR = 8,
     _RAM_LIM_ERROR      = 9,
-    _FILE_NAME_ERROR    = 10
+    _FILE_NAME_ERROR    = 10,
+    _NULL_ADDRESS_ERROR = 11,
+    _CHECK_FOUND_ERROR  = 12,
+    _SIZE_COMMAND_ERROR = 13
 };
 
 enum MeaningBit{
-    TURN_ON_FIGURE    = 1,
-    TURN_ON_REGISTERS = 2,
-    TURN_ON_RAM       = 4
+    TURN_ON_IMMED    = 32,
+    TURN_ON_REGISTERS = 64,
+    TURN_ON_RAM       = 128,
+    ONLY_COMMAND      = 31,
+    ONLY_MARKERS      = 224
 };
 
 struct labels_info {

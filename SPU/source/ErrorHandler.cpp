@@ -60,6 +60,21 @@ ErrorNumbers errorHandler(ErrorNumbers error)
             fprintf(stderr, "ERROR: The file name is not specified\n");
             break;
         }
+        case _NULL_ADDRESS_ERROR:
+        {
+            fprintf(stderr, "ERROR: a null address was detected\n");
+            break;
+        }
+        case _CHECK_FOUND_ERROR:
+        {
+            fprintf(stderr, "ERROR: The verifier has detected an error\n");
+            break;
+        }
+        case _SIZE_COMMAND_ERROR:
+        {
+            fprintf(stderr, "ERROR: Increase the limit of command size\n");
+            break;
+        }
         default:
         {
             fprintf(stderr, "Unknown error\n");
@@ -68,4 +83,3 @@ ErrorNumbers errorHandler(ErrorNumbers error)
     }
     return _NO_ERROR;
 }
-

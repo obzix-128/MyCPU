@@ -4,24 +4,28 @@
 ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                                info_array_with_verbal_commands array_vb_cmd)
 {
+    CHECK_NULL_ADDR_ERROR(array_nl_cmd, _NULL_ADDRESS_ERROR);
+
     ErrorNumbers check_error = _NO_ERROR;
 
     unsigned int ip = 0;
-    unsigned int characters_were_read = 0; // TODO: Структуру мб?
+    unsigned int characters_were_read = 0;
     unsigned int command_size = 0;
 
-    const unsigned int _SIZE_OF_THE_COMMAND = 11;
+    const unsigned int _SIZE_OF_THE_COMMAND = 50;
     char command[_SIZE_OF_THE_COMMAND] = {};
 
     const int NUMBER_OF_LABELS = 10;
     labels_info* lables_for_assembler = (labels_info*) calloc(NUMBER_OF_LABELS, sizeof(labels_info));
+    CHECK_NULL_ADDR_ERROR(lables_for_assembler, _CALLOC_ERROR);
+
     const unsigned int _SIZE_OF_THE_LABEL_NAME = 11;
     char label_name[_SIZE_OF_THE_LABEL_NAME] = {};
 
     stack_info fixup = {};
     StackElem_t fixup_element = {};
 
-    StackCtor(&fixup);
+    CHECK_ERROR(StackCtor(&fixup));
 
     while(characters_were_read < array_vb_cmd.size_of_the_array_with_verbal_commands)
     {
@@ -32,69 +36,76 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
 
         sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", command,
                (int*)&command_size);
-        characters_were_read += command_size + 1;
+        characters_were_read += command_size;
+
+        if(command_size > _SIZE_OF_THE_COMMAND)
+        {
+            return _SIZE_COMMAND_ERROR;
+        }
 
         if(strcmp(command, "push") == 0)
         {
-            array_nl_cmd->array_with_commands[ip] = PUSH_COMMAND;
-
+            array_nl_cmd->array_with_commands[ip] =
+            array_nl_cmd->array_with_commands[ip] | PUSH_COMMAND;
             sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n",
                    command, (int*)&command_size);
+
             characters_were_read += command_size + 1;
 
             char* pointer = NULL;
 
             if(strchr(command, 'x'))
             {
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_REGISTERS;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
 
                 pointer = strchr(command, 'x');
-                array_nl_cmd->array_with_commands[ip + 2] = ((*(pointer - 1) - 'a') + 1);
-                if(array_nl_cmd->array_with_commands[ip + 2] > (int)_NUMBER_OF_REGISTERS)
+                array_nl_cmd->array_with_commands[ip + 1] = ((*(pointer - 1) - 'a') + 1);
+                if(array_nl_cmd->array_with_commands[ip + 1] > (signed int)_NUMBER_OF_REGISTERS)
                 {
                     return _REGISTER_LIM_ERROR;
                 }
             }
             if(strchr(command, '['))
             {
-                if(array_nl_cmd->array_with_commands[ip + 1] == 0)
+                if(array_nl_cmd->array_with_commands[ip] == PUSH_COMMAND)
                 {
-                    array_nl_cmd->array_with_commands[ip + 1] =
-                    array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_FIGURE;
+                    array_nl_cmd->array_with_commands[ip] =
+                    array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
                     pointer = strchr(command, '[');
-                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 2]);
+                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 1]);
                 }
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_RAM;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_RAM;
+            }
+            if(array_nl_cmd->array_with_commands[ip] == PUSH_COMMAND)
+            {
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
+
+                sscanf(command, "%d", &array_nl_cmd->array_with_commands[ip + 1]);
             }
             if(strchr(command, '+'))
             {
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_FIGURE;
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_REGISTERS;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
 
                 pointer = strchr(command, '+');
-                array_nl_cmd->array_with_commands[ip + 3] =
-                array_nl_cmd->array_with_commands[ip + 2];
+                array_nl_cmd->array_with_commands[ip + 2] =
+                array_nl_cmd->array_with_commands[ip + 1];
+                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 1]);
 
-                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 2]);
                 ip += 1;
             }
-            if(array_nl_cmd->array_with_commands[ip + 1] == 0)
-            {
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_FIGURE;
 
-                sscanf(command, "%d", &array_nl_cmd->array_with_commands[ip + 2]);
-            }
-
-            ip += 3;
+            ip += 2;
         }
         else if(strcmp(command, "pop") == 0)
         {
-            array_nl_cmd->array_with_commands[ip] = POP_COMMAND;
+            array_nl_cmd->array_with_commands[ip] =
+            array_nl_cmd->array_with_commands[ip] | POP_COMMAND;
 
             sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n",
                    command, (int*)&command_size);
@@ -104,44 +115,44 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
 
             if(strchr(command, 'x'))
             {
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_REGISTERS;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
 
                 pointer = strchr(command, 'x');
-                array_nl_cmd->array_with_commands[ip + 2] = ((*(pointer - 1) - 'a') + 1);
-                if(array_nl_cmd->array_with_commands[ip + 2] > (int)_NUMBER_OF_REGISTERS)
+                array_nl_cmd->array_with_commands[ip + 1] = ((*(pointer - 1) - 'a') + 1);
+                if(array_nl_cmd->array_with_commands[ip + 1] > (int)_NUMBER_OF_REGISTERS)
                 {
                     return _REGISTER_LIM_ERROR;
                 }
             }
             if(strchr(command, '['))
             {
-                if(array_nl_cmd->array_with_commands[ip + 1] == 0)
+                if(array_nl_cmd->array_with_commands[ip] == POP_COMMAND)
                 {
-                    array_nl_cmd->array_with_commands[ip + 1] =
-                    array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_FIGURE;
+                    array_nl_cmd->array_with_commands[ip] =
+                    array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
                     pointer = strchr(command, '[');
-                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 2]);
+                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 1]);
                 }
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_RAM;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_RAM;
             }
             if(strchr(command, '+'))
             {
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_FIGURE;
-                array_nl_cmd->array_with_commands[ip + 1] =
-                array_nl_cmd->array_with_commands[ip + 1] | TURN_ON_REGISTERS;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
+                array_nl_cmd->array_with_commands[ip] =
+                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
 
                 pointer = strchr(command, '+');
-                array_nl_cmd->array_with_commands[ip + 3] =
-                array_nl_cmd->array_with_commands[ip + 2];
+                array_nl_cmd->array_with_commands[ip + 2] =
+                array_nl_cmd->array_with_commands[ip + 1];
 
-                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 2]);
+                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 1]);
                 ip += 1;
             }
 
-            ip += 3;
+            ip += 2;
         }
         else if(strcmp(command, "out") == 0)
         {
@@ -227,7 +238,7 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 strcpy(fixup_element.label_name, label_name);
                 fixup_element.label_address = ip + 1;
 
-                StackPush(&fixup, fixup_element);
+                CHECK_ERROR(StackPush(&fixup, fixup_element));
 
                 array_nl_cmd->array_with_commands[ip] = JMP_COMMAND;
                 array_nl_cmd->array_with_commands[ip + 1] = -1;
@@ -239,12 +250,10 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
             sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", label_name,
                    (int*)&command_size);
             characters_were_read += command_size + 1;
+
             char* colon_address = NULL;
             colon_address = strchr(label_name, ':');
-            if(colon_address == NULL)
-            {
-                return _SYNTAXIS_ERROR;
-            }
+            CHECK_NULL_ADDR_ERROR(colon_address, _SYNTAXIS_ERROR);
             *colon_address = '\0';
 
             for(int i = 0; i < NUMBER_OF_LABELS; i++)
@@ -262,11 +271,12 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 strcpy(fixup_element.label_name, label_name);
                 fixup_element.label_address = ip + 1;
 
-                StackPush(&fixup, fixup_element);
+                CHECK_ERROR(StackPush(&fixup, fixup_element));
 
                 array_nl_cmd->array_with_commands[ip] = JB_COMMAND;
                 array_nl_cmd->array_with_commands[ip + 1] = -1;
             }
+
             ip += 2;
         }
         else if(strcmp(command, "call") == 0)
@@ -274,12 +284,10 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
             sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", label_name,
                    (int*)&command_size);
             characters_were_read += command_size + 1;
+
             char* colon_address = NULL;
             colon_address = strchr(label_name, ':');
-            if(colon_address == NULL)
-            {
-                return _SYNTAXIS_ERROR;
-            }
+            CHECK_NULL_ADDR_ERROR(colon_address, _SYNTAXIS_ERROR);
             *colon_address = '\0';
 
             for(int i = 0; i < NUMBER_OF_LABELS; i++)
@@ -297,7 +305,7 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 strcpy(fixup_element.label_name, label_name);
                 fixup_element.label_address = ip + 1;
 
-                StackPush(&fixup, fixup_element);
+                CHECK_ERROR(StackPush(&fixup, fixup_element));
 
                 array_nl_cmd->array_with_commands[ip] = CALL_COMMAND;
                 array_nl_cmd->array_with_commands[ip + 1] = -1;
@@ -317,7 +325,7 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
         else if(strchr(command, ':') != 0)
         {
             char* colon_address = NULL;
-            colon_address = strchr(command, ':');
+            colon_address = strchr(command, ':');;
             *colon_address = '\0';
 
             for(int i = 0; i < NUMBER_OF_LABELS; i++)
@@ -325,6 +333,7 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 if(lables_for_assembler[i].label_address == 0)
                 {
                     strcpy(lables_for_assembler[i].label_name, command);
+
                     lables_for_assembler[i].label_address = ip;
                     break;
                 }
@@ -334,16 +343,35 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 }
             }
         }
+        else if(strchr(command, ';') != 0)
+        {
+            while(*(array_vb_cmd.array_with_verbal_commands + characters_were_read) != '\0')
+            {
+                characters_were_read++;
+            }
+        }
         else
         {
             fprintf(stdout, "%s\n", command);
             return _SYNTAXIS_ERROR;
         }
+        while(true)
+        {
+            if(*(array_vb_cmd.array_with_verbal_commands + characters_were_read) == '\0' ||
+               *(array_vb_cmd.array_with_verbal_commands + characters_were_read) == ' ')
+            {
+                characters_were_read++;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     while(fixup.size != 0)
     {
-        StackPop(&fixup, &fixup_element);
+        CHECK_ERROR(StackPop(&fixup, &fixup_element));
 
         for(int j = 0; j < NUMBER_OF_LABELS; j++)
         {
@@ -357,7 +385,7 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
 
     array_nl_cmd->number_of_commands = ip;
 
-    StackDtor(&fixup);
+    CHECK_ERROR(StackDtor(&fixup));
 
     return check_error;
 }

@@ -36,4 +36,7 @@ push 2
 mul
 div
 out
+push 1
+pop [5]
+prnt
 hlt
