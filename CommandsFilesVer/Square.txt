@@ -3,7 +3,20 @@ in
 in
 pop cx
 pop bx
-pop ax
+pop ax ; Ввожу a, b, c И кладу их в одноимённые регистры
+
+push 0
+push ax
+je linear: ; Сравниваю коэффициент a и 0, если равны отправляю решать линейное уравнение
+
+push 0
+push bx
+je bezb: ; Сравниваю коэффициент b и 0, если равны отправляю решать вариант "Без Б"
+
+push 0
+push cx
+je bezc: ; Сравниваю коэффициент c и 0, если равны отправляю решить вариант "без C"
+
 push bx
 push bx
 mul
@@ -13,7 +26,8 @@ push 4
 mul
 mul
 sub
-pop dx
+pop dx ; Вычислил Дискриминант
+
 push bx
 push -1
 mul
@@ -24,7 +38,8 @@ push ax
 push 2
 mul
 div
-out
+out ; Первый корень
+
 push bx
 push -1
 mul
@@ -36,7 +51,50 @@ push 2
 mul
 div
 out
-push 1
-pop [5]
-prnt
-hlt
+hlt ; Второй корень
+
+bezc:
+    push 0
+    out ; Первый корень 0
+
+    push bx
+    pop cx
+    push ax
+    pop bx
+    call linear: ; Меняю местами коэффициенты и отправляю решать линейное уравнение
+    hlt
+
+bezb:
+    push -1
+    push cx
+    mul
+    push ax
+    div
+    sqrt
+    out ; Первый корень
+
+    push -1
+    push cx
+    mul
+    push ax
+    div
+    sqrt
+    push -1
+    mul
+    out ; Второй корень (С минусом)
+
+    hlt
+
+err:
+    push -666
+    out
+    hlt
+
+linear:
+    push -1
+    push cx
+    mul
+    push bx ; -c / b = x
+    div
+    out
+    hlt

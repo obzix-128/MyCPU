@@ -1,6 +1,17 @@
+push 555
+push 4
 push 5
-push dx
-push dx+5
-push [6]
-push [hx]
-push [hx+6]
+push 666
+push 4
+push 4
+je as:
+hlt
+
+as:
+out
+je ab:
+out
+hlt
+
+ab:
+hlt

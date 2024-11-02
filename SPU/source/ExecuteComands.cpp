@@ -105,6 +105,11 @@ ErrorNumbers executeCurrentCommand(info_array_with_commands_code* executable_cod
             CHECK_ERROR(prntCommand(executable_code, random_access_memory));
             break;
         }
+        case JE_COMMAND:
+        {
+            CHECK_ERROR(jeCommand(executable_code, my_stack));
+            break;
+        }
         default:
         {
             return _SYNTAXIS_ERROR;

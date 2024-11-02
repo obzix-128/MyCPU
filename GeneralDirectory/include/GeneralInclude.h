@@ -2,7 +2,7 @@
 #define GENERALINCLUDE_H
 
 #define _SIGNATURE_ "OBZIX_128"
-#define _ASSEMBLER_VERSION_ "v_5"
+#define _ASSEMBLER_VERSION_ "v_8"
 
 enum CommandNumber{
     PUSH_COMMAND = 1,
@@ -22,7 +22,8 @@ enum CommandNumber{
     JB_COMMAND   = 15,
     CALL_COMMAND = 16,
     RET_COMMAND  = 17,
-    PRNT_COMMAND = 18
+    PRNT_COMMAND = 18,
+    JE_COMMAND   = 19
 };
 
 enum ErrorNumbers{

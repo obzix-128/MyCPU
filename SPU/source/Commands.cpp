@@ -280,3 +280,28 @@ ErrorNumbers prntCommand(info_array_with_commands_code* executable_code,
 
     return _NO_ERROR;
 }
+
+ErrorNumbers jeCommand(info_array_with_commands_code* executable_code, stack_info* my_stack)
+{
+    CHECK_NULL_ADDR_ERROR(executable_code, _NULL_ADDRESS_ERROR);
+    CHECK_NULL_ADDR_ERROR(my_stack, _NULL_ADDRESS_ERROR);
+
+    ErrorNumbers check_error = _NO_ERROR;
+    StackElem_t first = 0;
+    StackElem_t second = 0;
+
+    CHECK_ERROR(StackPop(my_stack, &first));
+    CHECK_ERROR(StackPop(my_stack, &second));
+
+    if(second == first)
+    {
+        executable_code->ip++;
+        executable_code->ip = executable_code->code[executable_code->ip];
+    }
+    else
+    {
+        executable_code->ip += 2;
+    }
+
+    return _NO_ERROR;
+}

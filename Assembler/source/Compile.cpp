@@ -2,7 +2,7 @@
 
 
 ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
-                               info_array_with_verbal_commands array_vb_cmd)
+                                info_array_with_verbal_commands array_vb_cmd) // TODO: Заменить на *?
 {
     CHECK_NULL_ADDR_ERROR(array_nl_cmd, _NULL_ADDRESS_ERROR);
 
@@ -23,7 +23,6 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
     char label_name[_SIZE_OF_THE_LABEL_NAME] = {};
 
     stack_info fixup = {};
-    StackElem_t fixup_element = {};
 
     CHECK_ERROR(StackCtor(&fixup));
 
@@ -45,114 +44,13 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
 
         if(strcmp(command, "push") == 0)
         {
-            array_nl_cmd->array_with_commands[ip] =
-            array_nl_cmd->array_with_commands[ip] | PUSH_COMMAND;
-            sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n",
-                   command, (int*)&command_size);
-
-            characters_were_read += command_size + 1;
-
-            char* pointer = NULL;
-
-            if(strchr(command, 'x'))
-            {
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
-
-                pointer = strchr(command, 'x');
-                array_nl_cmd->array_with_commands[ip + 1] = ((*(pointer - 1) - 'a') + 1);
-                if(array_nl_cmd->array_with_commands[ip + 1] > (signed int)_NUMBER_OF_REGISTERS)
-                {
-                    return _REGISTER_LIM_ERROR;
-                }
-            }
-            if(strchr(command, '['))
-            {
-                if(array_nl_cmd->array_with_commands[ip] == PUSH_COMMAND)
-                {
-                    array_nl_cmd->array_with_commands[ip] =
-                    array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
-                    pointer = strchr(command, '[');
-                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 1]);
-                }
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_RAM;
-            }
-            if(array_nl_cmd->array_with_commands[ip] == PUSH_COMMAND)
-            {
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
-
-                sscanf(command, "%d", &array_nl_cmd->array_with_commands[ip + 1]);
-            }
-            if(strchr(command, '+'))
-            {
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
-
-                pointer = strchr(command, '+');
-                array_nl_cmd->array_with_commands[ip + 2] =
-                array_nl_cmd->array_with_commands[ip + 1];
-                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 1]);
-
-                ip += 1;
-            }
-
-            ip += 2;
+            CHECK_ERROR(pushOrPop(array_nl_cmd, &array_vb_cmd, PUSH_COMMAND, &characters_were_read,
+                                  &ip, command));
         }
         else if(strcmp(command, "pop") == 0)
         {
-            array_nl_cmd->array_with_commands[ip] =
-            array_nl_cmd->array_with_commands[ip] | POP_COMMAND;
-
-            sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n",
-                   command, (int*)&command_size);
-            characters_were_read += command_size + 1;
-
-            char* pointer = NULL;
-
-            if(strchr(command, 'x'))
-            {
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
-
-                pointer = strchr(command, 'x');
-                array_nl_cmd->array_with_commands[ip + 1] = ((*(pointer - 1) - 'a') + 1);
-                if(array_nl_cmd->array_with_commands[ip + 1] > (int)_NUMBER_OF_REGISTERS)
-                {
-                    return _REGISTER_LIM_ERROR;
-                }
-            }
-            if(strchr(command, '['))
-            {
-                if(array_nl_cmd->array_with_commands[ip] == POP_COMMAND)
-                {
-                    array_nl_cmd->array_with_commands[ip] =
-                    array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
-                    pointer = strchr(command, '[');
-                    sscanf(pointer, "[%d", &array_nl_cmd->array_with_commands[ip + 1]);
-                }
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_RAM;
-            }
-            if(strchr(command, '+'))
-            {
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_IMMED;
-                array_nl_cmd->array_with_commands[ip] =
-                array_nl_cmd->array_with_commands[ip] | TURN_ON_REGISTERS;
-
-                pointer = strchr(command, '+');
-                array_nl_cmd->array_with_commands[ip + 2] =
-                array_nl_cmd->array_with_commands[ip + 1];
-
-                sscanf(pointer, "+%d", &array_nl_cmd->array_with_commands[ip + 1]);
-                ip += 1;
-            }
-
-            ip += 2;
+            CHECK_ERROR(pushOrPop(array_nl_cmd, &array_vb_cmd, POP_COMMAND, &characters_were_read,
+                                  &ip, command));
         }
         else if(strcmp(command, "out") == 0)
         {
@@ -211,106 +109,21 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
         }
         else if(strcmp(command, "jmp") == 0)
         {
-            sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", label_name,
-                   (int*)&command_size);
-            characters_were_read += command_size + 1;
-
-            char* colon_address = NULL;
-            colon_address = strchr(label_name, ':');
-            if(colon_address == NULL)
-            {
-                return _SYNTAXIS_ERROR;
-            }
-            *colon_address = '\0';
-
-            for(int i = 0; i < NUMBER_OF_LABELS; i++)
-            {
-                if(strcmp(label_name, lables_for_assembler[i].label_name) == 0)
-                {
-                    array_nl_cmd->array_with_commands[ip] = JMP_COMMAND;
-                    array_nl_cmd->array_with_commands[ip + 1] = lables_for_assembler[i].label_address;
-                    break;
-                }
-            }
-
-            if(array_nl_cmd->array_with_commands[ip] == 0)
-            {
-                strcpy(fixup_element.label_name, label_name);
-                fixup_element.label_address = ip + 1;
-
-                CHECK_ERROR(StackPush(&fixup, fixup_element));
-
-                array_nl_cmd->array_with_commands[ip] = JMP_COMMAND;
-                array_nl_cmd->array_with_commands[ip + 1] = -1;
-            }
-            ip += 2;
+            CHECK_ERROR(differentJumpsCommands(array_nl_cmd, &array_vb_cmd, JMP_COMMAND,
+                                               &characters_were_read, &ip, command, label_name,
+                                               NUMBER_OF_LABELS, &fixup, lables_for_assembler));
         }
         else if(strcmp(command, "jb") == 0)
         {
-            sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", label_name,
-                   (int*)&command_size);
-            characters_were_read += command_size + 1;
-
-            char* colon_address = NULL;
-            colon_address = strchr(label_name, ':');
-            CHECK_NULL_ADDR_ERROR(colon_address, _SYNTAXIS_ERROR);
-            *colon_address = '\0';
-
-            for(int i = 0; i < NUMBER_OF_LABELS; i++)
-            {
-                if(strcmp(label_name, lables_for_assembler[i].label_name) == 0)
-                {
-                    array_nl_cmd->array_with_commands[ip] = JB_COMMAND;
-                    array_nl_cmd->array_with_commands[ip + 1] = lables_for_assembler[i].label_address;
-                    break;
-                }
-            }
-
-            if(array_nl_cmd->array_with_commands[ip] == 0)
-            {
-                strcpy(fixup_element.label_name, label_name);
-                fixup_element.label_address = ip + 1;
-
-                CHECK_ERROR(StackPush(&fixup, fixup_element));
-
-                array_nl_cmd->array_with_commands[ip] = JB_COMMAND;
-                array_nl_cmd->array_with_commands[ip + 1] = -1;
-            }
-
-            ip += 2;
+            CHECK_ERROR(differentJumpsCommands(array_nl_cmd, &array_vb_cmd, JB_COMMAND,
+                                               &characters_were_read, &ip, command, label_name,
+                                               NUMBER_OF_LABELS, &fixup, lables_for_assembler));
         }
         else if(strcmp(command, "call") == 0)
         {
-            sscanf(array_vb_cmd.array_with_verbal_commands + characters_were_read, "%s%n", label_name,
-                   (int*)&command_size);
-            characters_were_read += command_size + 1;
-
-            char* colon_address = NULL;
-            colon_address = strchr(label_name, ':');
-            CHECK_NULL_ADDR_ERROR(colon_address, _SYNTAXIS_ERROR);
-            *colon_address = '\0';
-
-            for(int i = 0; i < NUMBER_OF_LABELS; i++)
-            {
-                if(strcmp(label_name, lables_for_assembler[i].label_name) == 0)
-                {
-                    array_nl_cmd->array_with_commands[ip] = CALL_COMMAND;
-                    array_nl_cmd->array_with_commands[ip + 1] = lables_for_assembler[i].label_address;
-                    break;
-                }
-            }
-
-            if(array_nl_cmd->array_with_commands[ip] == 0)
-            {
-                strcpy(fixup_element.label_name, label_name);
-                fixup_element.label_address = ip + 1;
-
-                CHECK_ERROR(StackPush(&fixup, fixup_element));
-
-                array_nl_cmd->array_with_commands[ip] = CALL_COMMAND;
-                array_nl_cmd->array_with_commands[ip + 1] = -1;
-            }
-            ip += 2;
+            CHECK_ERROR(differentJumpsCommands(array_nl_cmd, &array_vb_cmd, CALL_COMMAND,
+                                               &characters_were_read, &ip, command, label_name,
+                                               NUMBER_OF_LABELS, &fixup, lables_for_assembler));
         }
         else if(strcmp(command, "ret") == 0)
         {
@@ -321,6 +134,12 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
         {
             array_nl_cmd->array_with_commands[ip] =PRNT_COMMAND;
             ip += 1;
+        }
+        else if(strcmp(command, "je") == 0)
+        {
+            CHECK_ERROR(differentJumpsCommands(array_nl_cmd, &array_vb_cmd, JE_COMMAND,
+                                               &characters_were_read, &ip, command, label_name,
+                                               NUMBER_OF_LABELS, &fixup, lables_for_assembler));
         }
         else if(strchr(command, ':') != 0)
         {
@@ -355,23 +174,32 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
             fprintf(stdout, "%s\n", command);
             return _SYNTAXIS_ERROR;
         }
-        while(true)
-        {
-            if(*(array_vb_cmd.array_with_verbal_commands + characters_were_read) == '\0' ||
-               *(array_vb_cmd.array_with_verbal_commands + characters_were_read) == ' ')
-            {
-                characters_were_read++;
-            }
-            else
-            {
-                break;
-            }
-        }
+
+        skipSpaces(&array_vb_cmd, &characters_were_read);
     }
 
-    while(fixup.size != 0)
+    CHECK_ERROR(doFixup(array_nl_cmd, &fixup, lables_for_assembler, NUMBER_OF_LABELS));
+
+    array_nl_cmd->number_of_commands = ip;
+
+    CHECK_ERROR(StackDtor(&fixup));
+
+    return check_error;
+}
+
+ErrorNumbers doFixup(info_array_with_commands* array_nl_cmd, stack_info* fixup,
+                     labels_info* lables_for_assembler, const int NUMBER_OF_LABELS)
+{
+    CHECK_NULL_ADDR_ERROR(array_nl_cmd, _NULL_ADDRESS_ERROR);
+    CHECK_NULL_ADDR_ERROR(fixup, _NULL_ADDRESS_ERROR);
+    CHECK_NULL_ADDR_ERROR(lables_for_assembler, _NULL_ADDRESS_ERROR);
+
+    ErrorNumbers check_error = _NO_ERROR;
+    StackElem_t fixup_element = {};
+
+    while(fixup->size != 0)
     {
-        CHECK_ERROR(StackPop(&fixup, &fixup_element));
+        CHECK_ERROR(StackPop(fixup, &fixup_element));
 
         for(int j = 0; j < NUMBER_OF_LABELS; j++)
         {
@@ -383,9 +211,5 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
         }
     }
 
-    array_nl_cmd->number_of_commands = ip;
-
-    CHECK_ERROR(StackDtor(&fixup));
-
-    return check_error;
+    return _NO_ERROR;
 }
