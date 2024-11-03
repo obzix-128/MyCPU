@@ -27,5 +27,6 @@ ErrorNumbers retCommand(info_array_with_commands_code* executable_code, stack_in
 ErrorNumbers prntCommand(info_array_with_commands_code* executable_code,
                          StackElem_t random_access_memory[]);
 ErrorNumbers jeCommand(info_array_with_commands_code* executable_code, stack_info* my_stack);
+ErrorNumbers sqrCommand(info_array_with_commands_code* executable_code, stack_info* my_stack);
 
 #endif // COMMANDS_H

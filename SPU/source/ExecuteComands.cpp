@@ -110,6 +110,11 @@ ErrorNumbers executeCurrentCommand(info_array_with_commands_code* executable_cod
             CHECK_ERROR(jeCommand(executable_code, my_stack));
             break;
         }
+        case SQR_COMMAND:
+        {
+            CHECK_ERROR(sqrCommand(executable_code, my_stack));
+            break;
+        }
         default:
         {
             return _SYNTAXIS_ERROR;
@@ -132,8 +137,10 @@ ErrorNumbers executeCommands(info_array_with_commands_code* executable_code)
     struct stack_info return_address = {};
     CHECK_ERROR(StackCtor(&return_address));
 
-    StackElem_t registers[_NUMBER_OF_REGISTERS] = {};
-    StackElem_t random_access_memory[_SIZE_OF_RAM] = {};
+    StackElem_t* registers = (StackElem_t*) calloc(_NUMBER_OF_REGISTERS, sizeof(StackElem_t));
+    CHECK_NULL_ADDR_ERROR(registers, _CALLOC_ERROR);
+    StackElem_t* random_access_memory = (StackElem_t*) calloc(_SIZE_OF_RAM, sizeof(StackElem_t));
+    CHECK_NULL_ADDR_ERROR(random_access_memory, _CALLOC_ERROR);
 
     while(executable_code->ip < executable_code->size_of_code)
     {
@@ -168,8 +175,10 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
     {
         if(argument_type & TURN_ON_IMMED)
         {
-            registers[0] = *argument_value + registers[executable_code->code[executable_code->ip]];
-            argument_value = &registers[0];
+            registers[executable_code->code[executable_code->ip]] =
+            *argument_value + registers[executable_code->code[executable_code->ip]];
+
+            argument_value = &registers[executable_code->code[executable_code->ip]];
             executable_code->ip++;
         }
         else

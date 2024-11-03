@@ -23,7 +23,8 @@ enum CommandNumber{
     CALL_COMMAND = 16,
     RET_COMMAND  = 17,
     PRNT_COMMAND = 18,
-    JE_COMMAND   = 19
+    JE_COMMAND   = 19,
+    SQR_COMMAND  = 20
 };
 
 enum ErrorNumbers{
@@ -57,6 +58,6 @@ struct labels_info {
 };
 
 const unsigned int _SIZE_OF_THE_ARRAY_WITH_COMMANDS = 512;
-const unsigned int _NUMBER_OF_REGISTERS = 8;
+const unsigned int _NUMBER_OF_REGISTERS = 9;
 
 #endif // GENERALINCLUDE_H

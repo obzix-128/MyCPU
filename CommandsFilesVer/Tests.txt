@@ -1,17 +1,3 @@
-push 555
-push 4
-push 5
-push 666
-push 4
-push 4
-je as:
-hlt
+in
+in
 
-as:
-out
-je ab:
-out
-hlt
-
-ab:
-hlt

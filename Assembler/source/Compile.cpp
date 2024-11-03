@@ -141,6 +141,11 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                                                &characters_were_read, &ip, command, label_name,
                                                NUMBER_OF_LABELS, &fixup, lables_for_assembler));
         }
+        else if(strcmp(command, "sqr") == 0)
+        {
+            array_nl_cmd->array_with_commands[ip] = SQR_COMMAND;
+            ip += 1;
+        }
         else if(strchr(command, ':') != 0)
         {
             char* colon_address = NULL;
