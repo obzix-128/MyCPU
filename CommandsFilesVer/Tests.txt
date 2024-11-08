@@ -1,3 +1,8 @@
 in
 in
-
+pop bx
+pop cx
+push bx+5
+push cx+4
+out
+out

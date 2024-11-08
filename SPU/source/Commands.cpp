@@ -13,7 +13,9 @@ ErrorNumbers pushCommand(info_array_with_commands_code* executable_code, StackEl
     ErrorNumbers check_error = _NO_ERROR;
     StackElem_t first = 0;
     first = (int) getArguments(executable_code, registers, random_access_memory);
+
     CHECK_ERROR(StackPush(my_stack, *((int*) first)));
+
     return _NO_ERROR;
 }
 

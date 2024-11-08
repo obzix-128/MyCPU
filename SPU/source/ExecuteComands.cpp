@@ -2,6 +2,35 @@
 #include "../include/Commands.h"
 
 
+ErrorNumbers executeCommands(info_array_with_commands_code* executable_code)
+{
+    CHECK_NULL_ADDR_ERROR(executable_code, _NULL_ADDRESS_ERROR);
+
+    ErrorNumbers check_error = _NO_ERROR;
+
+    struct stack_info my_stack = {};
+    CHECK_ERROR(StackCtor(&my_stack));
+
+    struct stack_info return_address = {};
+    CHECK_ERROR(StackCtor(&return_address));
+
+    StackElem_t* registers = (StackElem_t*) calloc(_NUMBER_OF_REGISTERS, sizeof(StackElem_t));
+    CHECK_NULL_ADDR_ERROR(registers, _CALLOC_ERROR);
+    StackElem_t* random_access_memory = (StackElem_t*) calloc(_SIZE_OF_RAM, sizeof(StackElem_t));
+    CHECK_NULL_ADDR_ERROR(random_access_memory, _CALLOC_ERROR);
+
+    while(executable_code->ip < executable_code->size_of_code)
+    {
+        CHECK_ERROR(executeCurrentCommand(executable_code, registers, random_access_memory,
+                                          &my_stack, &return_address));
+    }
+
+    CHECK_ERROR(StackDtor(&my_stack));
+    CHECK_ERROR(StackDtor(&return_address));
+
+    return _NO_ERROR;
+}
+
 ErrorNumbers executeCurrentCommand(info_array_with_commands_code* executable_code,
                                    StackElem_t registers[], StackElem_t random_access_memory[],
                                    stack_info* my_stack, stack_info* return_address)
@@ -125,35 +154,6 @@ ErrorNumbers executeCurrentCommand(info_array_with_commands_code* executable_cod
     return check_error;
 }
 
-ErrorNumbers executeCommands(info_array_with_commands_code* executable_code)
-{
-    CHECK_NULL_ADDR_ERROR(executable_code, _NULL_ADDRESS_ERROR);
-
-    ErrorNumbers check_error = _NO_ERROR;
-
-    struct stack_info my_stack = {};
-    CHECK_ERROR(StackCtor(&my_stack));
-
-    struct stack_info return_address = {};
-    CHECK_ERROR(StackCtor(&return_address));
-
-    StackElem_t* registers = (StackElem_t*) calloc(_NUMBER_OF_REGISTERS, sizeof(StackElem_t));
-    CHECK_NULL_ADDR_ERROR(registers, _CALLOC_ERROR);
-    StackElem_t* random_access_memory = (StackElem_t*) calloc(_SIZE_OF_RAM, sizeof(StackElem_t));
-    CHECK_NULL_ADDR_ERROR(random_access_memory, _CALLOC_ERROR);
-
-    while(executable_code->ip < executable_code->size_of_code)
-    {
-        CHECK_ERROR(executeCurrentCommand(executable_code, registers, random_access_memory,
-                                          &my_stack, &return_address));
-    }
-
-    CHECK_ERROR(StackDtor(&my_stack));
-    CHECK_ERROR(StackDtor(&return_address));
-
-    return _NO_ERROR;
-}
-
 StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackElem_t registers[],
                           StackElem_t random_access_memory[])
 {
@@ -164,6 +164,7 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
     int argument_type = executable_code->code[executable_code->ip] & ONLY_MARKERS;
     executable_code->ip++;
     StackElem_t* argument_value = NULL;
+    StackElem_t value = 0;
 
     if(argument_type & TURN_ON_IMMED)
     {
@@ -175,10 +176,8 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
     {
         if(argument_type & TURN_ON_IMMED)
         {
-            registers[executable_code->code[executable_code->ip]] =
-            *argument_value + registers[executable_code->code[executable_code->ip]];
-
-            argument_value = &registers[executable_code->code[executable_code->ip]];
+            value = *argument_value + registers[executable_code->code[executable_code->ip]];
+            argument_value = &value;
             executable_code->ip++;
         }
         else

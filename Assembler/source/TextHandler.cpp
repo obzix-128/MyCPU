@@ -59,6 +59,18 @@ ErrorNumbers textProcessing(info_array_with_verbal_commands* array_vb_cmd)
         }
     }
 
+    for(unsigned int i = 0; i < array_vb_cmd->size_of_the_array_with_verbal_commands; i++)
+    {
+        if(array_vb_cmd->array_with_verbal_commands[i] == ';')
+        {
+            while(array_vb_cmd->array_with_verbal_commands[i] != '\0')
+            {
+                array_vb_cmd->array_with_verbal_commands[i] = '\0';
+                i++;
+            }
+        }
+    }
+
     return _NO_ERROR;
 }
 

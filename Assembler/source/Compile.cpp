@@ -167,13 +167,6 @@ ErrorNumbers assemblingCommands(info_array_with_commands* array_nl_cmd,
                 }
             }
         }
-        else if(strchr(command, ';') != 0)
-        {
-            while(*(array_vb_cmd.array_with_verbal_commands + characters_were_read) != '\0')
-            {
-                characters_were_read++;
-            }
-        }
         else
         {
             fprintf(stdout, "%s\n", command);

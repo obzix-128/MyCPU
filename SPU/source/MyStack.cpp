@@ -69,6 +69,8 @@ ErrorNumbers StackDtor(stack_info* my_stack)
 
     *my_stack = {};
 
+    my_stack = NULL;
+
     return _NO_ERROR;
 }
 
