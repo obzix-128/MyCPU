@@ -1,13 +1,11 @@
-#ifndef MYSTACK_H
-#define MYSTACK_H
-
-#include "../../GeneralDirectory/include/GeneralInclude.h"
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdio.h>
+
+#include "../../GeneralDirectory/include/GeneralInclude.h"
 
 #ifdef _DEBUG_
 #define _DEBUG_CHICK_CHIRICK
@@ -59,28 +57,6 @@ struct stack_info{
     #endif // _DEBUG_CHICK_CHIRICK
 };
 
-const int MIN_STACK_SIZE = 16;
+const int MIN_STACK_SIZE = 16;//TODO: глобальные константы снести?
 
-ErrorNumbers StackCtor(stack_info* my_stack);
-ErrorNumbers StackDtor(stack_info* my_stack);
-
-#ifdef _DEBUG_HASH_DJB
-ErrorNumbers calculateHash(stack_info* my_stack);
-#endif // _DEBUG_HASH_DJB
-#ifdef _DEBUG_CHICK_CHIRICK
-ErrorNumbers StackChickChiric(stack_info* my_stack);
-#endif // _DEBUG_CHICK_CHIRICK
-
-ErrorNumbers StackDump(stack_info* my_stack);
-#define STACK_ELEM_T "%4.d"
-
-ErrorNumbers StackPush(stack_info* my_stack, StackElem_t element_value);
-ErrorNumbers StackPop (stack_info* my_stack, StackElem_t* element_value);
-
-ErrorNumbers StackMemory(stack_info* my_stack);
-
-ErrorNumbers StackVerificator(stack_info* my_stack);
-
-#define STACK_VERIFICATOR if(StackVerificator(my_stack)) return StackVerificator(my_stack);
-
-#endif // MYSTACK_H
+#endif // MAIN_H

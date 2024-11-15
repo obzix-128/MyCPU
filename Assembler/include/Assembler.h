@@ -3,6 +3,10 @@
 
 #include "../../GeneralDirectory/include/GeneralInclude.h"
 #include "MyStack.h"
+#include "CtorAndDtor.h"
+#include "Dump.h"
+#include "PushAndPop.h"
+#include "Verificator.h"
 #include "ErrorHandler.h"
 
 #include <stdio.h>
