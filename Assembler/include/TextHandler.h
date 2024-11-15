@@ -8,5 +8,7 @@ ErrorNumbers readFile(info_array_with_verbal_commands* array_vb_cmd, const char*
 ErrorNumbers writeCommands(info_array_with_commands array_nl_cmd, const char* file_name);
 ErrorNumbers textProcessing(info_array_with_verbal_commands* array_vb_cmd);
 ErrorNumbers combiningStrings(const char* first, const char* second, char** result);
-
+ErrorNumbers skipSpaces(info_array_with_verbal_commands* array_vb_cmd,
+                        unsigned int* characters_were_read);
+                        
 #endif // TEXTHANDLER_H

@@ -83,4 +83,6 @@ ErrorNumbers StackVerificator(stack_info* my_stack);
 
 #define STACK_VERIFICATOR if(StackVerificator(my_stack)) return StackVerificator(my_stack);
 
+const int INT_MULTIPLIER = 100;
+
 #endif // MYSTACK_H

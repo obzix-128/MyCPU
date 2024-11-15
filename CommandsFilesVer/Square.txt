@@ -85,11 +85,6 @@ bezb:
 
     hlt
 
-err:
-    push -666
-    out
-    hlt
-
 linear:
     push -1
     push cx

@@ -11,11 +11,10 @@ ErrorNumbers pushCommand(info_array_with_commands_code* executable_code, StackEl
     CHECK_NULL_ADDR_ERROR(my_stack, _NULL_ADDRESS_ERROR);
 
     ErrorNumbers check_error = _NO_ERROR;
-    StackElem_t first = 0;
-    first = (int) getArguments(executable_code, registers, random_access_memory);
+    StackElem_t* first = 0;
+    first = getArguments(executable_code, registers, random_access_memory);
 
-    CHECK_ERROR(StackPush(my_stack, *((int*) first)));
-
+    CHECK_ERROR(StackPush(my_stack, *first));
     return _NO_ERROR;
 }
 
@@ -28,8 +27,10 @@ ErrorNumbers popCommand(info_array_with_commands_code* executable_code, StackEle
     CHECK_NULL_ADDR_ERROR(my_stack, _NULL_ADDRESS_ERROR);
 
     ErrorNumbers check_error = _NO_ERROR;
-    CHECK_ERROR(StackPop(my_stack, getArguments(executable_code, registers,
-                                                random_access_memory)));
+
+    StackElem_t* first = getArguments(executable_code, registers, random_access_memory);
+
+    CHECK_ERROR(StackPop(my_stack, first));
     return _NO_ERROR;
 }
 
@@ -42,7 +43,8 @@ ErrorNumbers outCommand(info_array_with_commands_code* executable_code, stack_in
     StackElem_t first = 0;
 
     CHECK_ERROR(StackPop(my_stack, &first));
-    printf(STACK_ELEM_T "\n", first);
+
+    fprintf(stdout, "%.2lf\n", (double)first / INT_MULTIPLIER);
     executable_code->ip++;
     return _NO_ERROR;
 }
@@ -77,8 +79,9 @@ ErrorNumbers inCommand(info_array_with_commands_code* executable_code, stack_inf
 
     fprintf(stdout, "Please enter a number\n");
     scanf(STACK_ELEM_T, &first);
-    CHECK_ERROR(StackPush(my_stack, first));
+    CHECK_ERROR(StackPush(my_stack, (first * INT_MULTIPLIER)));
     executable_code->ip++;
+
     return _NO_ERROR;
 }
 
@@ -93,8 +96,9 @@ ErrorNumbers addCommand(info_array_with_commands_code* executable_code, stack_in
 
     CHECK_ERROR(StackPop(my_stack, &first));
     CHECK_ERROR(StackPop(my_stack, &second));
-    CHECK_ERROR(StackPush(my_stack, first + second));
+    CHECK_ERROR(StackPush(my_stack, (first + second)));
     executable_code->ip++;
+
     return _NO_ERROR;
 }
 
@@ -109,8 +113,9 @@ ErrorNumbers subCommand(info_array_with_commands_code* executable_code, stack_in
 
     CHECK_ERROR(StackPop(my_stack, &first));
     CHECK_ERROR(StackPop(my_stack, &second));
-    CHECK_ERROR(StackPush(my_stack, second - first));
+    CHECK_ERROR(StackPush(my_stack, (second - first)));
     executable_code->ip++;
+
     return _NO_ERROR;
 }
 
@@ -125,7 +130,7 @@ ErrorNumbers mulCommand(info_array_with_commands_code* executable_code, stack_in
 
     CHECK_ERROR(StackPop(my_stack, &first));
     CHECK_ERROR(StackPop(my_stack, &second));
-    CHECK_ERROR(StackPush(my_stack, second * first));
+    CHECK_ERROR(StackPush(my_stack, ((second * first) / INT_MULTIPLIER)));
     executable_code->ip++;
 
     return _NO_ERROR;
@@ -142,7 +147,8 @@ ErrorNumbers divCommand(info_array_with_commands_code* executable_code, stack_in
 
     CHECK_ERROR(StackPop(my_stack, &first));
     CHECK_ERROR(StackPop(my_stack, &second));
-    CHECK_ERROR(StackPush(my_stack, second / first));
+
+    CHECK_ERROR(StackPush(my_stack, ((second * INT_MULTIPLIER) / first)));
     executable_code->ip++;
 
     return _NO_ERROR;
@@ -157,9 +163,8 @@ ErrorNumbers sqrtCommand(info_array_with_commands_code* executable_code, stack_i
     StackElem_t first = 0;
 
     CHECK_ERROR(StackPop(my_stack, &first));
-    CHECK_ERROR(StackPush(my_stack, (int)sqrt(first)));
+    CHECK_ERROR(StackPush(my_stack, (int)(sqrt(first * INT_MULTIPLIER))));
     executable_code->ip++;
-
     return _NO_ERROR;
 }
 
@@ -172,7 +177,7 @@ ErrorNumbers sinCommand(info_array_with_commands_code* executable_code, stack_in
     StackElem_t first = 0;
 
     CHECK_ERROR(StackPop(my_stack, &first));
-    CHECK_ERROR(StackPush(my_stack, (int)sin(first)));
+    CHECK_ERROR(StackPush(my_stack, (int)(sin(first / INT_MULTIPLIER) * INT_MULTIPLIER)));
     executable_code->ip++;
 
     return _NO_ERROR;
@@ -187,7 +192,7 @@ ErrorNumbers cosCommand(info_array_with_commands_code* executable_code, stack_in
     StackElem_t first = 0;
 
     CHECK_ERROR(StackPop(my_stack, &first));
-    CHECK_ERROR(StackPush(my_stack, (int)cos(first)));
+    CHECK_ERROR(StackPush(my_stack, (int)(cos(first / INT_MULTIPLIER) * INT_MULTIPLIER)));
     executable_code->ip++;
 
     return _NO_ERROR;
@@ -317,7 +322,7 @@ ErrorNumbers sqrCommand(info_array_with_commands_code* executable_code, stack_in
     StackElem_t first = 0;
 
     CHECK_ERROR(StackPop(my_stack, &first));
-    CHECK_ERROR(StackPush(my_stack, first * first));
+    CHECK_ERROR(StackPush(my_stack, (first * first / INT_MULTIPLIER)));
     executable_code->ip++;
 
     return _NO_ERROR;

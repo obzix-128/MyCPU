@@ -78,17 +78,42 @@ ErrorNumbers writeCommands(info_array_with_commands array_nl_cmd, const char* fu
 {
     CHECK_NULL_ADDR_ERROR(full_file_name, _FILE_NAME_ERROR);
 
-    FILE* file_with_numeral_commands = fopen(full_file_name, "w");
+    FILE* file_with_numeral_commands = fopen(full_file_name, "wb");
     CHECK_NULL_ADDR_ERROR(file_with_numeral_commands, _OPEN_ERROR);
 
-    fprintf(file_with_numeral_commands, _SIGNATURE_ "\n" _ASSEMBLER_VERSION_ "\n");
+    fwrite(&_SIGNATURE_, sizeof(int), 1, file_with_numeral_commands);
+    fwrite(&_ASSEMBLER_VERSION_, sizeof(int), 1, file_with_numeral_commands);
 
-    for(unsigned int i = 0; i < array_nl_cmd.number_of_commands; i++)
-    {
-        fprintf(file_with_numeral_commands, "%x ", array_nl_cmd.array_with_commands[i]);
-    }
+    const int _SIZE_ALIGNMENT = 2;
+    const int ALIGNMENT[_SIZE_ALIGNMENT] = {};
+    fwrite(ALIGNMENT, sizeof(int), _SIZE_ALIGNMENT, file_with_numeral_commands);
+
+    fwrite(array_nl_cmd.array_with_commands, sizeof(int), array_nl_cmd.number_of_commands,
+           file_with_numeral_commands);
 
     fclose(file_with_numeral_commands);
+
+    return _NO_ERROR;
+}
+
+ErrorNumbers skipSpaces(info_array_with_verbal_commands* array_vb_cmd,
+                        unsigned int* characters_were_read)
+{
+    CHECK_NULL_ADDR_ERROR(array_vb_cmd, _NULL_ADDRESS_ERROR);
+    CHECK_NULL_ADDR_ERROR(characters_were_read, _NULL_ADDRESS_ERROR);
+
+    while(true)
+    {
+        if(*(array_vb_cmd->array_with_verbal_commands + *characters_were_read) != '\0' &&
+           *(array_vb_cmd->array_with_verbal_commands + *characters_were_read) != ' ')
+        {
+            break;
+        }
+        else
+        {
+            (*characters_were_read)++;
+        }
+    }
 
     return _NO_ERROR;
 }

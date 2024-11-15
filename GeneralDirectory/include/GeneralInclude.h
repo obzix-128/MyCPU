@@ -1,8 +1,8 @@
 #ifndef GENERALINCLUDE_H
 #define GENERALINCLUDE_H
 
-#define _SIGNATURE_ "OBZIX_128"
-#define _ASSEMBLER_VERSION_ "v_8"
+const int _SIGNATURE_ = 1482310223;
+const int _ASSEMBLER_VERSION_ = 9;
 
 enum CommandNumber{
     PUSH_COMMAND = 1,

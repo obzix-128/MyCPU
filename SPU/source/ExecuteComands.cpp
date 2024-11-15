@@ -168,7 +168,8 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
 
     if(argument_type & TURN_ON_IMMED)
     {
-        argument_value = &executable_code->code[executable_code->ip];
+        value = executable_code->code[executable_code->ip] * INT_MULTIPLIER;
+        argument_value = &value;
         executable_code->ip++;
     }
 
@@ -176,7 +177,7 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
     {
         if(argument_type & TURN_ON_IMMED)
         {
-            value = *argument_value + registers[executable_code->code[executable_code->ip]];
+            value = (*argument_value) + registers[executable_code->code[executable_code->ip]];
             argument_value = &value;
             executable_code->ip++;
         }
@@ -189,11 +190,11 @@ StackElem_t* getArguments(info_array_with_commands_code* executable_code, StackE
 
     if(argument_type & TURN_ON_RAM)
     {
-        if(*argument_value > _SIZE_OF_RAM)
+        if((*argument_value / INT_MULTIPLIER) > _SIZE_OF_RAM)
         {
             assert(0);
         }
-        argument_value = &random_access_memory[*argument_value];
+        argument_value = &random_access_memory[(*argument_value / INT_MULTIPLIER)];
     }
 
     return argument_value;

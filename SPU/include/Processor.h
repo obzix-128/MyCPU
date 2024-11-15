@@ -5,11 +5,6 @@
 #include "MyStack.h"
 #include "ErrorHandler.h"
 
-struct info_array_with_commands_txt {
-    char* array;
-    unsigned int size_of_array;
-};
-
 struct info_array_with_commands_code {
     int* code;
     unsigned int ip;

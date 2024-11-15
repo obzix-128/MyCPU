@@ -17,6 +17,7 @@ ErrorNumbers StackCtor(stack_info* my_stack)
         return _CALLOC_ERROR;
     }
     my_stack->data = (StackElem_t*)((char*)my_stack->full_data + SIZE_CHICK_CHIRICK);
+    
     #else
     my_stack->data = (StackElem_t*) calloc(MIN_STACK_SIZE, sizeof(StackElem_t));
     if(my_stack->data == NULL)

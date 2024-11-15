@@ -28,7 +28,7 @@ int main(const int argc, const char** argv)
     array_nl_cmd.array_with_commands = (int*) calloc(_SIZE_OF_THE_ARRAY_WITH_COMMANDS, sizeof(int));
     CHECK_NULL_ADDR_ERROR(array_nl_cmd.array_with_commands, _CALLOC_ERROR);
 
-    CHECK_ERROR(assemblingCommands(&array_nl_cmd, array_vb_cmd));
+    CHECK_ERROR(assemblingCommands(&array_nl_cmd, &array_vb_cmd));
 
     const char* WAY_TO_FILE_FOR_WRITE  = "CommandsFilesNum/";
 

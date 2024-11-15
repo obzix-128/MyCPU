@@ -1,7 +1,6 @@
 #include "../include/Processor.h"
 #include "../include/ErrorHandler.h"
 #include "../include/ReadingFile.h"
-#include "../include/TextHandler.h"
 #include "../include/ExecuteCommands.h"
 
 
@@ -15,19 +14,16 @@ int main(const int argc, const char** argv)
     }
 
     ErrorNumbers check_error = _NO_ERROR;
-    struct info_array_with_commands_txt commands = {};
+
+    struct info_array_with_commands_code executable_code = {};
 
     const char* WAY_TO_FILE  = "CommandsFilesNum/";
     char* full_file_name = NULL;
 
     CHECK_ERROR(combiningStrings(WAY_TO_FILE, argv[1], &full_file_name));
-    CHECK_ERROR(readFileWithCommands(&commands, full_file_name));
-    CHECK_ERROR(checkVersion(&commands));
+    CHECK_ERROR(readFileWithCommands(&executable_code, full_file_name));
+    CHECK_ERROR(checkVersion(&executable_code));
 
-    struct info_array_with_commands_code executable_code = {};
-
-    CHECK_ERROR(processingAnArrayOfCommands(&commands, &executable_code));
-    
     CHECK_ERROR(executeCommands(&executable_code));
 
     printf("DONE\n");
