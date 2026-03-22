@@ -45,7 +45,7 @@ enum ErrorNumbers{
 };
 
 enum MeaningBit{
-    TURN_ON_IMMED    = 32,
+    TURN_ON_IMMED     = 32,
     TURN_ON_REGISTERS = 64,
     TURN_ON_RAM       = 128,
     ONLY_COMMAND      = 31,

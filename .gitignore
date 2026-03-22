@@ -3,3 +3,5 @@
 .vscode/
 DumpOutput.txt
 objects/
+CommandsFilesNum/*
+CommandsFilesVer/*

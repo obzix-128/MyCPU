@@ -16,7 +16,8 @@ all: ../asm.exe
 	@$(CC) $^ $(FLAGS) -o $@
 
 objects/%.o: source/%.cpp
-	@$(CC) -c $^ $(FLAGS) -o $@
+	@mkdir -p objects
+	@$(CC) -c $< $(FLAGS) -o $@
 
 clean:
-	@rm -rf objects/*.o ../asm.exe
+	@rm -rf objects ../asm.exe

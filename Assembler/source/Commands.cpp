@@ -21,7 +21,9 @@ ErrorNumbers pushOrPop(info_array_with_commands* array_nl_cmd,
             command, (int*)&command_size);
 
     CHECK_ERROR(checkImmed(&command_argiments,  array_vb_cmd, characters_were_read, command));
+
     CHECK_ERROR(checkRegister(&command_argiments, command));
+
     CHECK_ERROR(checkRandomAccessMemory(&command_argiments, command));
 
     CHECK_ERROR(writeArguments(array_nl_cmd, ip, &command_argiments));
@@ -63,7 +65,7 @@ ErrorNumbers checkImmed(arguments* command_argiments, info_array_with_verbal_com
     CHECK_NULL_ADDR_ERROR(command, _NULL_ADDRESS_ERROR);
 
     if(sscanf(array_vb_cmd->array_with_verbal_commands + (*characters_were_read),
-                   "%*[^0-9+-]%d", &command_argiments->immed))
+                   "%*[^0-9+-]%d", &command_argiments->immed) > 0)
     {
         command_argiments->command = command_argiments->command | TURN_ON_IMMED;
     }

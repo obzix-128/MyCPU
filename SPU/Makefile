@@ -16,7 +16,8 @@ all: ../do.exe
 	@$(CC) $^ $(FLAGS) -o $@
 
 objects/%.o: source/%.cpp
+	@mkdir -p objects
 	@$(CC) -c $^ $(FLAGS) -o $@
 
 clean:
-	@rm -rf objects/*.o ../do.exe
+	@rm -rf objects ../do.exe
